@@ -1,0 +1,47 @@
+<?php
+
+function editor_element_info_alter(&$types) {
+  if (!empty($types['text_format']['#pre_render'])) {
+    $types['text_format']['#pre_render'] = array_diff($types['text_format']['#pre_render'], array('ckeditor_pre_render_text_format'));
+  }
+  $types['text_format']['#pre_render'][] = 'editor_ckeditor_pre_render_text_format';
+}
+
+/**
+ * This function creates the HTML objects required for CKEditor.
+ *
+ * @param $element
+ *   A fully populated form element to add the editor to.
+ * @return
+ *   The same $element with extra CKEditor markup and initialization.
+ */
+function editor_ckeditor_pre_render_text_format($element) {
+  static $init = FALSE;
+  if (!isset($element['#format'])) {
+    return $element;
+  }
+
+  module_load_include('inc', 'ckeditor', 'includes/ckeditor.lib');
+  if ($init === FALSE) {
+    $input_formats = ckeditor_profiles_compile();
+    drupal_add_js(array('ckeditor' => array('input_formats' => $input_formats, 'plugins' => array())), 'setting');
+    $init = TRUE;
+  }
+
+  if (isset($element['value'])) {
+    if (!isset($element['format'])) {
+      return $element;
+    }
+    if (isset($element['summary'])) {
+      $element['value'] = ckeditor_load_by_field($element['value'], $element['format']['format'], TRUE, $element['summary']['#id']);
+    }
+    else {
+      $element['value'] = ckeditor_load_by_field($element['value'], $element['format']['format']);
+    }
+  }
+  else {
+    $element = ckeditor_load_by_field($element, $element['#format']);
+  }
+
+  return $element;
+}
