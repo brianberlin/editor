@@ -9,6 +9,13 @@
  */
 function editor_ckeditor_profile_defaults() {
   $data = array(
+    'CKEditor Global Profile' => array(
+      'name' => 'CKEditor Global Profile',
+      'settings' => array(
+        'ckeditor_path' => '%l/ckeditor',
+      ),
+      'input_formats' => array(),
+    ),
     'Full' => array(
       'name' => 'Full',
       'settings' => array(
